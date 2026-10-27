@@ -1,0 +1,32 @@
+﻿name: Seldon Fleet CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  static-analysis-and-unit-tests:
+    name: Static Analysis (Lint) & JVM Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Static Analysis (Android Lint - REQ-09)
+        run: ./gradlew lintDebug
+
+      - name: Run Unit Tests on JVM without Emulator (REQ-08 & REQ-09)
+        run: ./gradlew testDebugUnitTest
